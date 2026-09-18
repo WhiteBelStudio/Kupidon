@@ -4,31 +4,52 @@ Telegram Bot + Telegram Mini App для поиска друзей и общен�
 
 КУПИДОН не предназначен для романтического или сексуального общения.
 
-## Состав
-- Python 3.12+
-- aiogram 3
-- FastAPI
-- SQLite + aiosqlite
-- React + Vite
-- Telegram Mini App authentication через initData
-- профили, фото, поиск, лайк/пропуск, взаимные совпадения
-- блокировки и жалобы
-- базовая админ-проверка через ADMIN_IDS
+## Архитектура
 
-## Запуск
-1. Скопируйте .env.example в .env и укажите BOT_TOKEN.
-2. Укажите HTTPS WEBAPP_URL для Telegram Mini App.
-3. Укажите API_URL и CORS_ORIGINS.
-4. Установите Python-зависимости: python -m pip install -r requirements.txt
-5. Установите frontend-зависимости: cd webapp && npm install
-6. Из корня запустите API: uvicorn api.main:app --host 0.0.0.0 --port 8000
-7. В другом терминале запустите бота: python -m bot.main
-8. Для Mini App: cd webapp && npm run dev
+- `bot/` — Telegram Bot на aiogram
+- `api/` — FastAPI API
+- `backend/` — SQLite и Telegram WebApp authentication
+- `webapp/` — React/Vite Mini App
+- `database/migrations/` — схема БД
+
+## Vercel
+
+Mini App подготовлен для отдельного деплоя на Vercel.
+
+Настройки Vercel:
+
+- Root Directory: `webapp`
+- Framework Preset: Vite
+- Build Command: `npm run build`
+- Output Directory: `dist`
+- Install Command: `npm install`
+
+Переменная:
+
+```
+VITE_API_URL=https://ВАШ-API
+```
+
+Полученный HTTPS URL указывается как `WEBAPP_URL` для backend/bot.
+
+## Backend
+
+Backend запускается отдельно:
+
+```bash
+python -m pip install -r requirements.txt
+uvicorn api.main:app --host 0.0.0.0 --port 8000
+python -m bot.main
+```
 
 ## Проверка
-python -m pytest -q
-python -m compileall backend api bot
-cd webapp
-npm run build
 
-Настоящий .env и секреты не добавляются в Git.
+```bash
+python -m compileall backend api bot
+python -m pytest -q
+cd webapp
+npm install
+npm run build
+```
+
+Секреты и настоящий `.env` в GitHub не добавляются.
