@@ -1,3 +1,5 @@
+<!-- Vercel deployment trigger: 2026-09-19 12:41 -->
+
 # КУПИДОН 0.2.0
 
 Telegram Bot + Telegram Mini App для поиска друзей и общения.
@@ -49,7 +51,5 @@ npm run build
 ```
 
 Секреты и настоящий `.env` в GitHub не добавляются.
-
-<!-- Vercel deployment trigger: 2026-09-19 -->
 
 <!-- Vercel build compatibility check -->
