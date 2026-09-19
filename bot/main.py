@@ -9,7 +9,7 @@ from bot.handlers import start,admin
 
 async def main():
     settings=get_settings()
-    db=Database(settings.database_path)
+    db=Database(settings.database_url, settings.database_path)
     await db.init()
     bot=Bot(settings.bot_token,default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp=Dispatcher()
