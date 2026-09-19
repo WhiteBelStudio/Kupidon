@@ -2,7 +2,7 @@ import asyncio
 from aiogram import Bot,Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.types import BotCommand
+from aiogram.types import BotCommand,MenuButtonWebApp,WebAppInfo
 from backend.config import get_settings
 from backend.database import Database
 from bot.handlers import start,admin
@@ -15,6 +15,7 @@ async def main():
     dp=Dispatcher()
     dp.include_router(start.router)
     dp.include_router(admin.router)
+    await bot.set_chat_menu_button(menu_button=MenuButtonWebApp(text="🚀 КУПИДОН", web_app=WebAppInfo(url=settings.webapp_url)))
     await bot.set_my_commands([
         BotCommand(command="start",description="Открыть КУПИДОН"),
         BotCommand(command="help",description="Помощь"),
