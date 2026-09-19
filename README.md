@@ -1,4 +1,4 @@
-# КУПИДОН 0.1.0
+# КУПИДОН 0.2.0
 
 Telegram Bot + Telegram Mini App для поиска друзей и общения.
 
@@ -8,13 +8,13 @@ Telegram Bot + Telegram Mini App для поиска друзей и общен�
 
 - `bot/` — Telegram Bot на aiogram
 - `api/` — FastAPI API
-- `backend/` — SQLite и Telegram WebApp authentication
+- `backend/` — PostgreSQL/SQLite database adapter и Telegram WebApp authentication
 - `webapp/` — React/Vite Mini App
 - `database/migrations/` — схема БД
 
 ## Vercel
 
-Mini App подготовлен для отдельного деплоя на Vercel.
+Mini App подключён к GitHub-репозиторию `WhiteBelStudio/Kupidon` и деплоится на Vercel из ветки `main`. Backend и Mini App используют Neon PostgreSQL.
 
 Настройки Vercel:
 
@@ -24,11 +24,7 @@ Mini App подготовлен для отдельного деплоя на Ve
 - Output Directory: `dist`
 - Install Command: `npm install`
 
-Переменная:
-
-```
-VITE_API_URL=https://ВАШ-API
-```
+Для production frontend API использует same-origin `/api` и `/media`. Для dev можно использовать `VITE_DEV_TELEGRAM_ID`.
 
 Полученный HTTPS URL указывается как `WEBAPP_URL` для backend/bot.
 
