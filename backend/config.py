@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     webapp_url: str
     api_url: str = "http://localhost:8000"
 
+    database_url: str = ""
     database_path: str = "data/kupidon.db"
     upload_dir: str = "data/uploads"
 
@@ -35,11 +36,7 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> list[str]:
-        return [
-            x.strip()
-            for x in self.cors_origins.split(",")
-            if x.strip()
-        ]
+        return [x.strip() for x in self.cors_origins.split(",") if x.strip()]
 
 
 @lru_cache
