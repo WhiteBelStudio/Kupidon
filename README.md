@@ -51,3 +51,5 @@ npm run build
 Секреты и настоящий `.env` в GitHub не добавляются.
 
 <!-- Vercel deployment trigger: 2026-09-19 -->
+
+<!-- Vercel build compatibility check -->
