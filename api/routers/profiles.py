@@ -24,13 +24,18 @@ class ProfileInput(BaseModel):
         if v not in {"male","female","any"}: raise ValueError("Invalid target gender")
         return v
 
+def with_photo(profile):
+    if profile and profile.get("photo_path"):
+        profile["photo_url"]=f"/media/{profile['photo_path']}"
+    return profile
+
 @router.get("/profile")
 async def get_profile(request:Request,user:dict=Depends(current_user)):
-    return {"profile":await request.app.state.db.get_profile(user["id"])}
+    return {"profile":with_photo(await request.app.state.db.get_profile(user["id"]))}
 
 @router.post("/profile")
 async def save_profile(payload:ProfileInput,request:Request,user:dict=Depends(current_user)):
-    return {"profile":await request.app.state.db.save_profile(user["id"],payload.model_dump())}
+    return {"profile":with_photo(await request.app.state.db.save_profile(user["id"],payload.model_dump()))}
 
 @router.post("/profile/photo")
 async def upload_photo(request:Request,file:UploadFile=File(...),user:dict=Depends(current_user)):
@@ -41,6 +46,5 @@ async def upload_photo(request:Request,file:UploadFile=File(...),user:dict=Depen
     ext=Path(file.filename or "").suffix.lower()
     if ext not in {".jpg",".jpeg",".png",".webp"}: ext=".jpg"
     name=f"{user['id']}_{uuid4().hex}{ext}"
-    Path(request.app.state.settings.upload_dir,name).write_bytes(content)
-    await request.app.state.db.set_photo(user["id"],name)
-    return {"photo_path":name}
+    await request.app.state.db.set_photo(user["id"],name,content,file.content_type)
+    return {"photo_path":name,"photo_url":f"/media/{name}"}
