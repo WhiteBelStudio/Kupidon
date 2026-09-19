@@ -2,5 +2,15 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "rewrites": [
+    { "source": "/api/profile", "destination": "/api/index" },
+    { "source": "/api/profile/photo", "destination": "/api/index" },
+    { "source": "/api/search", "destination": "/api/index" },
+    { "source": "/api/matches", "destination": "/api/index" },
+    { "source": "/api/users/:path*", "destination": "/api/index" },
+    { "source": "/api/me", "destination": "/api/index" },
+    { "source": "/media/:path*", "destination": "/api/index" },
+    { "source": "/health", "destination": "/api/index" }
+  ]
 }
