@@ -6,7 +6,7 @@ const empty={age:14,city:"Белореченск",gender:"male",target_gender:"a
 
 function Photo({profile}){
   if(!profile?.photo_url&&!profile?.photo_path) return <div className="photo-placeholder">👤</div>;
-  const src=profile.photo_url||(import.meta.env.VITE_API_URL+"/media/"+profile.photo_path);
+  const src=profile.photo_url||("/media/"+profile.photo_path);
   return <img className="profile-photo" src={src} alt=""/>;
 }
 
