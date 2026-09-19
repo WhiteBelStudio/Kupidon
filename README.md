@@ -1,4 +1,4 @@
-<!-- Vercel deployment trigger: 2026-09-19 12:41 -->
+<!-- Vercel deployment trigger: FastAPI function fix 2026-09-19 -->
 
 # КУПИДОН 0.2.0
 
@@ -18,17 +18,7 @@ Telegram Bot + Telegram Mini App для поиска друзей и общен�
 
 Mini App подключён к GitHub-репозиторию `WhiteBelStudio/Kupidon` и деплоится на Vercel из ветки `main`. Backend и Mini App используют Neon PostgreSQL.
 
-Настройки Vercel:
-
-- Root Directory: `webapp`
-- Framework Preset: Vite
-- Build Command: `npm run build`
-- Output Directory: `dist`
-- Install Command: `npm install`
-
-Для production frontend API использует same-origin `/api` и `/media`. Для dev можно использовать `VITE_DEV_TELEGRAM_ID`.
-
-Полученный HTTPS URL указывается как `WEBAPP_URL` для backend/bot.
+Для production frontend API использует same-origin `/api` и `/media`.
 
 ## Backend
 
@@ -40,16 +30,4 @@ uvicorn api.main:app --host 0.0.0.0 --port 8000
 python -m bot.main
 ```
 
-## Проверка
-
-```bash
-python -m compileall backend api bot
-python -m pytest -q
-cd webapp
-npm install
-npm run build
-```
-
 Секреты и настоящий `.env` в GitHub не добавляются.
-
-<!-- Vercel build compatibility check -->
