@@ -6,7 +6,23 @@
   "installCommand": "npm install",
   "rewrites": [
     {
-      "source": "/api/:path*",
+      "source": "/api/profile",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/profile/photo",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/search",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/matches",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/api/users/:path*",
       "destination": "/api/index"
     }
   ]
