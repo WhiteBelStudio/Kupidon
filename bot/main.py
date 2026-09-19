@@ -15,14 +15,19 @@ async def main():
     dp=Dispatcher()
     dp.include_router(start.router)
     dp.include_router(admin.router)
+
+    await bot.delete_webhook(drop_pending_updates=False)
     await bot.set_chat_menu_button(menu_button=MenuButtonWebApp(text="🚀 КУПИДОН", web_app=WebAppInfo(url=settings.webapp_url)))
     await bot.set_my_commands([
         BotCommand(command="start",description="Открыть КУПИДОН"),
         BotCommand(command="help",description="Помощь"),
         BotCommand(command="admin",description="Панель администратора"),
     ])
-    try: await dp.start_polling(bot,db=db,settings=settings)
-    finally: await bot.session.close()
+    try:
+        await dp.start_polling(bot,db=db,settings=settings)
+    finally:
+        await db.close()
+        await bot.session.close()
 
 if __name__=="__main__":
     asyncio.run(main())
