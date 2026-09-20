@@ -47,8 +47,14 @@ function Matches(){
 }
 
 export default function App(){
-  const [tab,setTab]=useState("search"),[profile,setProfile]=useState(null),[error,setError]=useState("");
-  useEffect(()=>{initTelegram();api("/api/profile").then(r=>setProfile(r.profile)).catch(e=>setError(e.message))},[]);
-  if(error)return <main className="app"><div className="panel"><h1>КУПИДОН</h1><p>{error}</p><p className="muted">Открой Mini App через Telegram.</p></div></main>;
+  const [tab,setTab]=useState("search"),[profile,setProfile]=useState(null),[loading,setLoading]=useState(true);
+  useEffect(()=>{
+    initTelegram();
+    api("/api/profile")
+      .then(r=>setProfile(r.profile))
+      .catch(()=>setProfile(null))
+      .finally(()=>setLoading(false));
+  },[]);
+  if(loading)return <main className="app"><div className="panel"><h1>КУПИДОН</h1><p className="muted">Загрузка приложения…</p></div></main>;
   return <main className="app"><header><div><div className="brand">КУПИДОН</div><div className="subtitle">друзья и общение</div></div></header><section className="content">{!profile?<ProfileForm profile={null} onSaved={setProfile}/>:tab==="search"?<Search/>:tab==="matches"?<Matches/>:<ProfileForm profile={profile} onSaved={setProfile}/>}</section><nav className="bottom-nav"><button className={tab==="search"?"active":""} onClick={()=>setTab("search")}>🔎<span>Поиск</span></button><button className={tab==="matches"?"active":""} onClick={()=>setTab("matches")}>🤝<span>Совпадения</span></button><button className={tab==="profile"?"active":""} onClick={()=>setTab("profile")}>👤<span>Профиль</span></button></nav></main>;
 }
