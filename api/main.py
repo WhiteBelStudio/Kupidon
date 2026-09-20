@@ -7,6 +7,8 @@ from backend.config import get_settings
 from backend.database import Database
 from api.routers import auth,profiles,search,social
 
+VERSION="0.4.0"
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings=get_settings()
@@ -20,7 +22,7 @@ async def lifespan(app: FastAPI):
     await app.state.bot.session.close()
 
 settings=get_settings()
-app=FastAPI(title="КУПИДОН API",version="0.3.0")
+app=FastAPI(title="КУПИДОН API",version=VERSION)
 app.add_middleware(CORSMiddleware,allow_origins=settings.cors_origin_list,allow_credentials=True,allow_methods=["*"],allow_headers=["*"])
 app.include_router(auth.router,prefix="/api")
 app.include_router(profiles.router,prefix="/api")
@@ -36,4 +38,4 @@ async def media(photo_path:str):
 @app.get("/health")
 @app.get("/api/health")
 async def health():
-    return {"status":"ok","version":"0.3.0"}
+    return {"status":"ok","version":VERSION,"service":"kupidon-api"}
