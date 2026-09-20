@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     await app.state.bot.session.close()
 
 settings=get_settings()
-app=FastAPI(title="КУПИДОН API",version="0.2.0")
+app=FastAPI(title="КУПИДОН API",version="0.3.0")
 app.add_middleware(CORSMiddleware,allow_origins=settings.cors_origin_list,allow_credentials=True,allow_methods=["*"],allow_headers=["*"])
 app.include_router(auth.router,prefix="/api")
 app.include_router(profiles.router,prefix="/api")
@@ -34,5 +34,6 @@ async def media(photo_path:str):
     return Response(content=bytes(photo["data"]),media_type=photo["content_type"])
 
 @app.get("/health")
+@app.get("/api/health")
 async def health():
-    return {"status":"ok","version":"0.2.0"}
+    return {"status":"ok","version":"0.3.0"}
