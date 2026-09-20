@@ -4,8 +4,9 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "rewrites": [
+    { "source": "/api/health", "destination": "/api/health.py" },
+    { "source": "/health", "destination": "/api/health.py" },
     { "source": "/api/:path*", "destination": "/api/index.py" },
-    { "source": "/media/:path*", "destination": "/api/index.py" },
-    { "source": "/health", "destination": "/api/index.py" }
+    { "source": "/media/:path*", "destination": "/api/index.py" }
   ]
 }
