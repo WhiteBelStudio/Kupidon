@@ -47,14 +47,29 @@ function Matches(){
 }
 
 export default function App(){
-  const [tab,setTab]=useState("search"),[profile,setProfile]=useState(null),[loading,setLoading]=useState(true);
+  const [tab,setTab]=useState("search"),[profile,setProfile]=useState(null),[loading,setLoading]=useState(true),[startupError,setStartupError]=useState("");
+
+  async function loadProfile(){
+    setLoading(true);setStartupError("");
+    try{
+      const r=await api("/api/profile",{timeoutMs:8000});
+      setProfile(r.profile);
+    }catch(error){
+      setProfile(null);
+      setStartupError(error?.message||"Не удалось подключиться к API.");
+    }finally{
+      setLoading(false);
+    }
+  }
+
   useEffect(()=>{
     initTelegram();
-    api("/api/profile")
-      .then(r=>setProfile(r.profile))
-      .catch(()=>setProfile(null))
-      .finally(()=>setLoading(false));
+    loadProfile();
   },[]);
-  if(loading)return <main className="app"><div className="panel"><h1>КУПИДОН</h1><p className="muted">Загрузка приложения…</p></div></main>;
-  return <main className="app"><header><div><div className="brand">КУПИДОН</div><div className="subtitle">друзья и общение</div></div></header><section className="content">{!profile?<ProfileForm profile={null} onSaved={setProfile}/>:tab==="search"?<Search/>:tab==="matches"?<Matches/>:<ProfileForm profile={profile} onSaved={setProfile}/>}</section><nav className="bottom-nav"><button className={tab==="search"?"active":""} onClick={()=>setTab("search")}>🔎<span>Поиск</span></button><button className={tab==="matches"?"active":""} onClick={()=>setTab("matches")}>🤝<span>Совпадения</span></button><button className={tab==="profile"?"active":""} onClick={()=>setTab("profile")}>👤<span>Профиль</span></button></nav></main>;
+
+  if(loading)return <main className="app"><div className="panel splash"><div className="brand">КУПИДОН</div><p className="muted">Подключаем приложение…</p><div className="loader"/></div></main>;
+
+  return <main className="app"><header><div><div className="brand">КУПИДОН</div><div className="subtitle">друзья и общение</div></div></header><section className="content">
+    {!profile?<><ProfileForm profile={null} onSaved={setProfile}/>{startupError&&<div className="notice startup-notice">{startupError}<button className="secondary retry" type="button" onClick={loadProfile}>Повторить подключение</button></div>}</>:tab==="search"?<Search/>:tab==="matches"?<Matches/>:<ProfileForm profile={profile} onSaved={setProfile}/>} 
+  </section><nav className="bottom-nav"><button className={tab==="search"?"active":""} onClick={()=>setTab("search")}>🔎<span>Поиск</span></button><button className={tab==="matches"?"active":""} onClick={()=>setTab("matches")}>🤝<span>Совпадения</span></button><button className={tab==="profile"?"active":""} onClick={()=>setTab("profile")}>👤<span>Профиль</span></button></nav></main>;
 }

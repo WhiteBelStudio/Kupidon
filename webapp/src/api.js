@@ -21,10 +21,8 @@ function getGuestId(){
 
 export async function api(path,options={}){
   const headers=new Headers(options.headers||{});
-
-  // Telegram identity is optional. If the app is opened in Telegram, keep
-  // using its verified identity; otherwise use a persistent browser guest.
   const initData=getTelegramInitData();
+
   if(initData){
     headers.set("X-Telegram-Init-Data",initData);
     headers.set("Authorization",`tma ${initData}`);
@@ -35,10 +33,32 @@ export async function api(path,options={}){
   const devId=import.meta.env.VITE_DEV_TELEGRAM_ID;
   if(!initData && devId) headers.set("X-Dev-Telegram-Id",devId);
 
-  const response=await fetch(path,{...options,headers});
-  if(!response.ok){
-    const body=await response.json().catch(()=>({}));
-    throw new Error(body.detail||"Ошибка запроса");
+  const controller=new AbortController();
+  const externalSignal=options.signal;
+  const timeoutMs=Number(options.timeoutMs || 10000);
+  const timer=setTimeout(()=>controller.abort(),timeoutMs);
+
+  if(externalSignal){
+    if(externalSignal.aborted) controller.abort();
+    else externalSignal.addEventListener("abort",()=>controller.abort(),{once:true});
   }
-  return response.json();
+
+  const requestOptions={...options,headers,signal:controller.signal};
+  delete requestOptions.timeoutMs;
+
+  try{
+    const response=await fetch(path,requestOptions);
+    if(!response.ok){
+      const body=await response.json().catch(()=>({}));
+      throw new Error(body.detail||`Ошибка запроса (${response.status})`);
+    }
+    return response.json();
+  }catch(error){
+    if(error?.name==="AbortError"){
+      throw new Error("Сервер отвечает слишком долго. Попробуйте ещё раз.");
+    }
+    throw error;
+  }finally{
+    clearTimeout(timer);
+  }
 }

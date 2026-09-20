@@ -8,7 +8,6 @@ class Settings(BaseSettings):
     api_url: str = "http://localhost:8000"
 
     database_url: str = ""
-    database_url: str = ""
     database_path: str = "data/kupidon.db"
     upload_dir: str = "data/uploads"
 
