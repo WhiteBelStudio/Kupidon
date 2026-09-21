@@ -1,10 +1,14 @@
 from functools import lru_cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    bot_token: str
-    webapp_url: str
+    # Keep API startup resilient when the Vercel project has not yet received
+    # the bot secret. Telegram auth will be unavailable until BOT_TOKEN is set,
+    # but guest/browser mode and the rest of the API must still start.
+    bot_token: str = ""
+    webapp_url: str = "http://localhost:5173"
     api_url: str = "http://localhost:8000"
 
     database_url: str = ""
