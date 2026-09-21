@@ -9,7 +9,7 @@ from backend.config import get_settings
 from backend.database import Database
 from api.routers import auth, profiles, search, social
 
-VERSION = "0.4.1"
+VERSION = "0.4.2"
 
 
 @asynccontextmanager
@@ -19,10 +19,16 @@ async def lifespan(app: FastAPI):
     await db.init()
     app.state.settings = settings
     app.state.db = db
-    app.state.bot = Bot(settings.bot_token)
+
+    # The API does not need a Telegram Bot instance for guest/browser mode.
+    # Only create it when BOT_TOKEN is actually configured.
+    app.state.bot = Bot(settings.bot_token) if settings.bot_token else None
+
     yield
+
     await db.close()
-    await app.state.bot.session.close()
+    if app.state.bot is not None:
+        await app.state.bot.session.close()
 
 
 settings = get_settings()
