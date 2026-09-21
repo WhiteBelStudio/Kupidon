@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler
 import json
 
-VERSION = "0.4.2"
+VERSION = "0.4.4"
 
 
 class handler(BaseHTTPRequestHandler):
