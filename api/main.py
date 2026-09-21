@@ -10,7 +10,7 @@ from backend.config import get_settings
 from backend.database import Database
 from api.routers import auth, profiles, search, social
 
-VERSION = "0.4.3"
+VERSION = "0.4.4"
 
 # Vercel's Python ASGI adapter may serve requests without running FastAPI's
 # lifespan hooks. Keep the shared application state available at import time,
