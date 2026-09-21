@@ -1,7 +1,8 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from aiogram import Bot
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 
@@ -9,30 +10,49 @@ from backend.config import get_settings
 from backend.database import Database
 from api.routers import auth, profiles, search, social
 
-VERSION = "0.4.2"
+VERSION = "0.4.3"
+
+# Vercel's Python ASGI adapter may serve requests without running FastAPI's
+# lifespan hooks. Keep the shared application state available at import time,
+# then lazily initialize the database on the first request.
+settings = get_settings()
+db = Database(settings.database_url, settings.database_path)
+init_lock = asyncio.Lock()
+initialized = False
+
+
+async def ensure_initialized() -> None:
+    global initialized
+    if initialized:
+        return
+    async with init_lock:
+        if initialized:
+            return
+        await db.init()
+        initialized = True
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    settings = get_settings()
-    db = Database(settings.database_url, settings.database_path)
-    await db.init()
-    app.state.settings = settings
-    app.state.db = db
-
-    # The API does not need a Telegram Bot instance for guest/browser mode.
-    # Only create it when BOT_TOKEN is actually configured.
-    app.state.bot = Bot(settings.bot_token) if settings.bot_token else None
-
+    await ensure_initialized()
     yield
-
     await db.close()
-    if app.state.bot is not None:
-        await app.state.bot.session.close()
 
 
-settings = get_settings()
-app = FastAPI(title="КУПИДОН API", version=VERSION)
+app = FastAPI(title="КУПИДОН API", version=VERSION, lifespan=lifespan)
+
+# Make state available even when the platform skips the lifespan event.
+app.state.settings = settings
+app.state.db = db
+app.state.bot = Bot(settings.bot_token) if settings.bot_token else None
+
+
+@app.middleware("http")
+async def initialize_before_request(request: Request, call_next):
+    await ensure_initialized()
+    return await call_next(request)
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
@@ -40,6 +60,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 app.include_router(auth.router, prefix="/api")
 app.include_router(profiles.router, prefix="/api")
 app.include_router(search.router, prefix="/api")
